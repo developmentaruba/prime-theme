@@ -1,0 +1,625 @@
+/* ==========================================================================
+   Social Profile Theme — main.css  v1.1
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties (defaults overridden by inline <style> from PHP)
+   -------------------------------------------------------------------------- */
+:root {
+	--sp-bg:          #0d0d0d;
+	--sp-accent:      #a3e635;
+	--sp-button:      #a3e635;
+	--sp-card:        #1a1a1a;
+	--sp-text:        #f0f0f0;
+	--sp-text-muted:  rgba(240,240,240,0.5);
+	--sp-border:      rgba(255,255,255,0.09);
+	--sp-radius:      12px;
+	--sp-shadow:      0 4px 24px rgba(0,0,0,.5);
+	--sp-font:        'Inter', 'Helvetica Neue', Arial, sans-serif;
+	--sp-max-width:   640px;
+	/* button text: auto-contrast — use dark text on light button */
+	--sp-btn-text:    #0d0d0d;
+}
+
+/* --------------------------------------------------------------------------
+   Reset / Base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html  { scroll-behavior: smooth; }
+body  {
+	font-family: var(--sp-font);
+	background-color: var(--sp-bg);
+	color: var(--sp-text);
+	line-height: 1.6;
+	min-height: 100vh;
+	-webkit-font-smoothing: antialiased;
+}
+img   { display: block; max-width: 100%; height: auto; }
+a     { color: inherit; text-decoration: none; }
+
+/* --------------------------------------------------------------------------
+   Page Wrapper
+   -------------------------------------------------------------------------- */
+.sp-page {
+	width: 100%;
+	max-width: var(--sp-max-width);
+	margin: 0 auto;
+	padding: 48px 20px 80px;
+}
+
+/* --------------------------------------------------------------------------
+   Profile Header
+   -------------------------------------------------------------------------- */
+.sp-header { text-align: center; padding-bottom: 32px; }
+
+.sp-header__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+/* ── Avatar ── */
+.sp-avatar {
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 3px solid var(--sp-accent);
+	box-shadow: 0 0 0 5px color-mix(in srgb, var(--sp-accent) 18%, transparent);
+	flex-shrink: 0;
+	margin-bottom: 4px;
+}
+.sp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sp-avatar--placeholder {
+	background: color-mix(in srgb, var(--sp-accent) 15%, var(--sp-card));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.sp-avatar--placeholder span {
+	font-size: 2.5rem;
+	font-weight: 700;
+	color: var(--sp-accent);
+	line-height: 1;
+}
+
+/* ── Name ── */
+.sp-name {
+	font-size: clamp(1.6rem, 5vw, 2.2rem);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+/* ── Subtitle ── */
+.sp-subtitle {
+	font-size: 0.95rem;
+	color: var(--sp-text-muted);
+	font-weight: 400;
+}
+
+/* ── Bio (secondary line) ── */
+.sp-bio {
+	font-size: 0.9rem;
+	color: var(--sp-text-muted);
+}
+
+/* ── Location ── */
+.sp-location {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.875rem;
+	color: var(--sp-text-muted);
+}
+.sp-location svg { color: var(--sp-accent); flex-shrink: 0; }
+
+/* ── Social Icons ── */
+.sp-socials {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin: 4px 0;
+}
+.sp-social-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.07);
+	color: var(--sp-text-muted);
+	transition: background 0.18s, color 0.18s, transform 0.18s;
+}
+.sp-social-icon svg { width: 17px; height: 17px; }
+.sp-social-icon img { width: 17px; height: 17px; object-fit: contain; }
+.sp-social-icon:hover,
+.sp-social-icon:focus-visible {
+	background: var(--sp-accent);
+	color: var(--sp-btn-text);
+	transform: translateY(-2px);
+	outline: none;
+}
+
+/* ── CTA Button ── */
+.sp-cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 6px;
+	padding: 13px 36px;
+	background: var(--sp-button);
+	color: var(--sp-btn-text);
+	font-size: 0.95rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	border-radius: 50px;
+	border: none;
+	cursor: pointer;
+	width: 100%;
+	max-width: 440px;
+	justify-content: center;
+	box-shadow: 0 4px 18px color-mix(in srgb, var(--sp-button) 40%, transparent);
+	transition: opacity 0.18s, transform 0.18s;
+	font-family: inherit;
+}
+.sp-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+.sp-cta svg   { opacity: 0.7; }
+
+/* --------------------------------------------------------------------------
+   Email Collection Modal
+   -------------------------------------------------------------------------- */
+.sp-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,0.7);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	opacity: 0;
+	transition: opacity 0.22s ease;
+}
+.sp-modal-overlay:not([hidden]) { opacity: 1; }
+.sp-modal-overlay[hidden]       { display: none !important; }
+
+.sp-modal {
+	background: #1a1a22;
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 18px;
+	padding: 36px 32px;
+	width: 100%;
+	max-width: 400px;
+	position: relative;
+	animation: sp-modal-in 0.25s ease forwards;
+}
+
+@keyframes sp-modal-in {
+	from { transform: translateY(16px) scale(0.98); opacity: 0; }
+	to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+.sp-modal__close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.08);
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--sp-text);
+	transition: background 0.15s;
+}
+.sp-modal__close:hover { background: rgba(255,255,255,0.15); }
+
+.sp-modal__title {
+	font-size: 1.25rem;
+	font-weight: 800;
+	margin-bottom: 8px;
+	padding-right: 32px;
+	line-height: 1.3;
+}
+
+.sp-modal__subtitle {
+	font-size: 0.875rem;
+	color: var(--sp-text-muted);
+	margin-bottom: 24px;
+	line-height: 1.6;
+}
+
+.sp-modal__form { display: flex; flex-direction: column; gap: 10px; }
+
+/* Only target direct-child inputs — NOT inputs nested inside the phone box */
+.sp-modal__field > input {
+	width: 100%;
+	background: rgba(255,255,255,0.06);
+	border: 1px solid rgba(255,255,255,0.12);
+	border-radius: 10px;
+	padding: 13px 16px;
+	color: var(--sp-text);
+	font-size: 0.95rem;
+	font-family: var(--sp-font);
+	outline: none;
+	transition: border-color 0.15s;
+}
+.sp-modal__field > input::placeholder { color: rgba(240,240,240,0.35); }
+.sp-modal__field > input:focus        { border-color: var(--sp-accent); }
+
+.sp-modal__feedback {
+	font-size: 0.85rem;
+	padding: 8px 12px;
+	border-radius: 8px;
+	background: rgba(163,230,53,0.1);
+	color: var(--sp-accent);
+	text-align: center;
+}
+.sp-modal__feedback.is-error {
+	background: rgba(248,113,113,0.1);
+	color: #f87171;
+}
+
+/* ==========================================================================
+   Phone combo — one box, same look as the email input
+   ========================================================================== */
+.sp-phone-box {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background: rgba(255,255,255,0.06);
+	border: 1px solid rgba(255,255,255,0.12);
+	border-radius: 10px;
+	transition: border-color 0.15s;
+	position: relative;
+}
+.sp-phone-box:focus-within { border-color: var(--sp-accent); }
+
+/* Dial trigger — div so no browser native styles apply at all */
+.sp-dial-trigger {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 13px 10px 13px 14px;
+	background: transparent;
+	color: var(--sp-text);
+	font-size: 0.875rem;
+	font-family: var(--sp-font);
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+	line-height: 1.5;
+	user-select: none;
+}
+.sp-dial-trigger:focus-visible {
+	outline: 2px solid var(--sp-accent);
+	outline-offset: -2px;
+	border-radius: 8px 0 0 8px;
+}
+.sp-dial-flag    { font-size: 1.05rem; line-height: 1; }
+.sp-dial-num     { letter-spacing: 0.01em; }
+.sp-dial-chevron { opacity: 0.45; transition: transform 0.18s; flex-shrink: 0; }
+.sp-dial-trigger[aria-expanded="true"] .sp-dial-chevron { transform: rotate(180deg); }
+
+.sp-phone-sep {
+	display: block;
+	width: 1px;
+	height: 20px;
+	background: rgba(255,255,255,0.14);
+	flex-shrink: 0;
+}
+
+.sp-phone-number {
+	-webkit-appearance: none;
+	appearance: none;
+	flex: 1;
+	min-width: 0;
+	width: auto;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	outline: none;
+	padding: 13px 16px;
+	margin: 0;
+	color: var(--sp-text);
+	font-size: 0.95rem;
+	font-family: var(--sp-font);
+}
+.sp-phone-number::placeholder { color: rgba(240,240,240,0.32); }
+
+/* Dropdown */
+.sp-dial-dropdown {
+	position: absolute;
+	top: calc(100% + 7px);
+	left: 0;
+	right: 0;
+	background: #18182a;
+	border: 1px solid rgba(255,255,255,0.12);
+	border-radius: 10px;
+	box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+	z-index: 9999;
+	overflow: hidden;
+}
+
+.sp-dial-search-wrap {
+	padding: 8px;
+	border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sp-dial-search {
+	-webkit-appearance: none;
+	appearance: none;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	background: rgba(255,255,255,0.07);
+	border: 1px solid rgba(255,255,255,0.09);
+	border-radius: 7px;
+	padding: 9px 12px;
+	color: var(--sp-text);
+	font-size: 0.875rem;
+	font-family: var(--sp-font);
+	outline: none;
+	transition: border-color 0.15s;
+}
+.sp-dial-search:focus        { border-color: var(--sp-accent); }
+.sp-dial-search::placeholder { color: rgba(240,240,240,0.28); }
+
+.sp-dial-list {
+	list-style: none;
+	max-height: 200px;
+	overflow-y: auto;
+	padding: 5px;
+	margin: 0;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sp-dial-list::-webkit-scrollbar       { width: 3px; }
+.sp-dial-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+.sp-dial-option {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 10px;
+	border-radius: 7px;
+	cursor: pointer;
+	font-size: 0.875rem;
+	color: var(--sp-text);
+	transition: background 0.1s;
+}
+.sp-dial-option:hover                        { background: rgba(255,255,255,0.08); }
+.sp-dial-option.is-selected                  { color: var(--sp-accent); }
+.sp-dial-option.is-selected .sp-dial-option__name { color: var(--sp-accent); }
+.sp-dial-option.is-hidden                    { display: none !important; }
+
+.sp-dial-option__flag { font-size: 1rem; line-height: 1; flex-shrink: 0; }
+.sp-dial-option__name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-dial-option__code { font-size: 0.8rem; color: rgba(240,240,240,0.4); flex-shrink: 0; }
+
+.sp-modal__submit {
+	width: 100%;
+	padding: 14px;
+	background: var(--sp-button);
+	color: var(--sp-btn-text);
+	font-size: 0.95rem;
+	font-weight: 700;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	font-family: var(--sp-font);
+	transition: opacity 0.15s;
+	margin-top: 4px;
+}
+.sp-modal__submit:hover    { opacity: 0.88; }
+.sp-modal__submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sp-modal__terms {
+	font-size: 0.75rem;
+	color: var(--sp-text-muted);
+	text-align: center;
+	margin-top: 16px;
+	line-height: 1.5;
+}
+.sp-modal__terms a { color: var(--sp-accent); }
+
+/* --------------------------------------------------------------------------
+   Tabs Navigation — pill style matching reference
+   -------------------------------------------------------------------------- */
+.sp-tabs-section { margin-top: 8px; }
+
+.sp-tabs-nav-wrap {
+	padding: 4px;
+	background: rgba(255,255,255,0.07);
+	border-radius: 50px;
+	margin-bottom: 20px;
+}
+
+.sp-tabs-nav {
+	display: flex;
+	gap: 2px;
+}
+
+.sp-tab-btn {
+	flex: 1;
+	background: none;
+	border: none;
+	border-radius: 50px;
+	padding: 10px 16px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--sp-text-muted);
+	cursor: pointer;
+	transition: background 0.18s, color 0.18s;
+	font-family: var(--sp-font);
+	white-space: nowrap;
+}
+.sp-tab-btn:hover { color: var(--sp-text); }
+.sp-tab-btn.is-active {
+	background: var(--sp-accent);
+	color: var(--sp-btn-text);
+}
+.sp-tab-btn:focus-visible {
+	outline: 2px solid var(--sp-accent);
+	outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Tab Panels
+   -------------------------------------------------------------------------- */
+.sp-tab-panel {
+	display: none;
+	animation: sp-fadein 0.2s ease forwards;
+}
+.sp-tab-panel.is-active { display: block; }
+
+@keyframes sp-fadein {
+	from { opacity: 0; transform: translateY(6px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+.sp-empty {
+	color: var(--sp-text-muted);
+	font-size: 0.9rem;
+	text-align: center;
+	padding: 40px 0;
+}
+
+/* --------------------------------------------------------------------------
+   Cards — fixed uniform height, button on right
+   -------------------------------------------------------------------------- */
+.sp-cards {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.sp-card {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	background: var(--sp-card);
+	border: 1px solid var(--sp-border);
+	border-radius: var(--sp-radius);
+	overflow: hidden;
+	min-height: 80px;
+	transition: border-color 0.18s, transform 0.18s;
+}
+.sp-card:hover {
+	border-color: color-mix(in srgb, var(--sp-accent) 40%, transparent);
+	transform: translateX(2px);
+}
+
+/* ── Thumbnail (square, fixed size) ── */
+.sp-card__thumb {
+	width: 80px;
+	height: 80px;
+	flex-shrink: 0;
+	background: color-mix(in srgb, var(--sp-accent) 10%, #111);
+	position: relative;
+	overflow: hidden;
+}
+.sp-card__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.sp-card__thumb-icon {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: color-mix(in srgb, var(--sp-accent) 40%, transparent);
+}
+
+/* ── Body (takes remaining space) ── */
+.sp-card__body {
+	flex: 1;
+	min-width: 0;
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 3px;
+}
+
+.sp-card__label {
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--sp-accent);
+	line-height: 1;
+}
+
+.sp-card__title {
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--sp-text);
+	line-height: 1.3;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.sp-card__meta {
+	font-size: 0.78rem;
+	color: var(--sp-text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ── Action (button pinned right) ── */
+.sp-card__action {
+	flex-shrink: 0;
+	padding: 0 14px 0 8px;
+}
+
+.sp-card__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 7px 14px;
+	background: var(--sp-accent);
+	border: 1px solid var(--sp-accent);
+	color: var(--sp-btn-text);
+	font-size: 0.78rem;
+	font-weight: 700;
+	border-radius: 50px;
+	white-space: nowrap;
+	transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+.sp-card__btn:hover { opacity: 0.85; }
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.sp-footer {
+	text-align: center;
+	padding: 32px 20px;
+	font-size: 0.78rem;
+	color: var(--sp-text-muted);
+	border-top: 1px solid var(--sp-border);
+	margin-top: 60px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (min-width: 600px) {
+	.sp-page     { padding: 60px 32px 100px; }
+	.sp-avatar   { width: 120px; height: 120px; }
+	.sp-card__thumb { width: 90px; height: 90px; }
+	.sp-card     { min-height: 90px; }
+}
