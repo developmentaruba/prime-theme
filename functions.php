@@ -1,6 +1,28 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+// ---------------------------------------------------------------------------
+// GitHub Update Checker (Plugin Update Checker by Yahnis Elsts)
+// ---------------------------------------------------------------------------
+require_once get_template_directory() . '/vendor/plugin-update-checker/load-v5p3.php';
+
+add_action( 'after_setup_theme', function () {
+	$checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/developmentaruba/prime-theme/',
+		get_template_directory() . '/style.css',
+		'social-profile'
+	);
+
+	$checker->setBranch( 'main' );
+
+	// Private repo: reads token from wp-config.php constant GITHUB_ACCESS_TOKEN
+	if ( defined( 'GITHUB_ACCESS_TOKEN' ) ) {
+		$checker->setAuthentication( GITHUB_ACCESS_TOKEN );
+	}
+} );
+
+// ---------------------------------------------------------------------------
+
 function sp_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );
