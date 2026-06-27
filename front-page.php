@@ -284,6 +284,15 @@ get_header();
 			</div>
 
 			<div class="sp-tabs-content" id="sp-tabs-content">
+				<?php
+				// Helper: extract YouTube video ID from any YouTube URL
+				function sp_youtube_id( string $url ): string {
+					if ( preg_match( '/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/', $url, $m ) ) {
+						return $m[1];
+					}
+					return '';
+				}
+				?>
 				<?php foreach ( $tabs as $i => $tab ) : ?>
 					<div
 						class="sp-tab-panel<?php echo $i === 0 ? ' is-active' : ''; ?>"
@@ -294,75 +303,140 @@ get_header();
 					>
 						<?php if ( empty( $tab['items'] ) ) : ?>
 							<p class="sp-empty">No items yet.</p>
-						<?php else : ?>
-							<div class="sp-cards">
-								<?php foreach ( $tab['items'] as $idx => $item ) : ?>
-									<?php if ( ( $tab['card_type'] ?? 'media' ) === 'event' ) : ?>
 
-										<!-- EVENT CARD -->
-										<article class="sp-card sp-card--event">
-											<div class="sp-card__thumb">
-												<?php if ( ! empty( $item['image'] ) ) : ?>
-													<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" loading="lazy">
-												<?php else : ?>
-													<div class="sp-card__thumb-icon">
-														<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-													</div>
-												<?php endif; ?>
-											</div>
-											<div class="sp-card__body">
+						<?php elseif ( ( $tab['card_type'] ?? 'media' ) === 'event' ) : ?>
+
+							<?php
+							// Sort: upcoming first (closest date), past at bottom
+							$today    = strtotime( 'today' );
+							$upcoming = [];
+							$past     = [];
+							foreach ( $tab['items'] as $item ) {
+								$ts = ! empty( $item['date'] ) ? strtotime( $item['date'] ) : 0;
+								if ( $ts && $ts < $today ) {
+									$past[] = $item;
+								} else {
+									$upcoming[] = $item;
+								}
+							}
+							// Sort upcoming: nearest first
+							usort( $upcoming, function( $a, $b ) {
+								return strtotime( $a['date'] ?: '9999-01-01' ) - strtotime( $b['date'] ?: '9999-01-01' );
+							} );
+							// Sort past: most recent first
+							usort( $past, function( $a, $b ) {
+								return strtotime( $b['date'] ?: '0' ) - strtotime( $a['date'] ?: '0' );
+							} );
+							$all_events = array_merge( $upcoming, $past );
+							?>
+
+							<div class="sp-cards">
+								<?php foreach ( $all_events as $item ) :
+									$ts       = ! empty( $item['date'] ) ? strtotime( $item['date'] ) : 0;
+									$is_past  = $ts && $ts < $today;
+								?>
+									<article class="sp-card sp-card--event<?php echo $is_past ? ' sp-card--past' : ''; ?>">
+										<div class="sp-card__thumb">
+											<?php if ( ! empty( $item['image'] ) ) : ?>
+												<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" loading="lazy">
+											<?php else : ?>
+												<div class="sp-card__thumb-icon">
+													<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+												</div>
+											<?php endif; ?>
+										</div>
+										<div class="sp-card__body">
+											<div class="sp-card__labels">
 												<?php if ( ! empty( $item['city'] ) ) : ?>
 													<span class="sp-card__label"><?php echo esc_html( $item['city'] ); ?></span>
 												<?php endif; ?>
-												<h3 class="sp-card__title"><?php echo esc_html( $item['title'] ); ?></h3>
-												<p class="sp-card__meta">
-													<?php if ( ! empty( $item['date'] ) ) : ?>
-														<?php $ts = strtotime( $item['date'] ); echo $ts ? esc_html( date_i18n( 'M j, Y', $ts ) ) : esc_html( $item['date'] ); ?>
-													<?php endif; ?>
-													<?php if ( ! empty( $item['date'] ) && ! empty( $item['venue'] ) ) echo ' &bull; '; ?>
-													<?php if ( ! empty( $item['venue'] ) ) echo esc_html( $item['venue'] ); ?>
-												</p>
-											</div>
-											<?php if ( ! empty( $item['btn_url'] ) && ! empty( $item['btn_text'] ) ) : ?>
-												<div class="sp-card__action">
-													<a href="<?php echo esc_url( $item['btn_url'] ); ?>" class="sp-card__btn" target="_blank" rel="noopener noreferrer">
-														<?php echo esc_html( $item['btn_text'] ); ?>
-													</a>
-												</div>
-											<?php endif; ?>
-										</article>
-
-									<?php else : ?>
-
-										<!-- MEDIA CARD -->
-										<article class="sp-card sp-card--media">
-											<div class="sp-card__thumb">
-												<?php if ( ! empty( $item['image'] ) ) : ?>
-													<img src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" loading="lazy">
-												<?php else : ?>
-													<div class="sp-card__thumb-icon">
-														<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-													</div>
+												<?php if ( $is_past ) : ?>
+													<span class="sp-card__past-badge">Past Event</span>
 												<?php endif; ?>
 											</div>
-											<div class="sp-card__body">
-												<h3 class="sp-card__title"><?php echo esc_html( $item['title'] ); ?></h3>
-												<?php if ( ! empty( $item['subtitle'] ) ) : ?>
-													<p class="sp-card__meta"><?php echo wp_kses_post( $item['subtitle'] ); ?></p>
-												<?php endif; ?>
+											<h3 class="sp-card__title"><?php echo esc_html( $item['title'] ); ?></h3>
+											<p class="sp-card__meta">
+												<?php if ( $ts ) echo esc_html( date_i18n( 'M j, Y', $ts ) ); ?>
+												<?php if ( $ts && ! empty( $item['venue'] ) ) echo ' &bull; '; ?>
+												<?php if ( ! empty( $item['venue'] ) ) echo esc_html( $item['venue'] ); ?>
+											</p>
+										</div>
+										<?php if ( ! $is_past && ! empty( $item['btn_url'] ) && ! empty( $item['btn_text'] ) ) : ?>
+											<div class="sp-card__action">
+												<a href="<?php echo esc_url( $item['btn_url'] ); ?>" class="sp-card__btn" target="_blank" rel="noopener noreferrer">
+													<?php echo esc_html( $item['btn_text'] ); ?>
+												</a>
 											</div>
-											<?php if ( ! empty( $item['btn_url'] ) && ! empty( $item['btn_text'] ) ) : ?>
-												<div class="sp-card__action">
-													<a href="<?php echo esc_url( $item['btn_url'] ); ?>" class="sp-card__btn" target="_blank" rel="noopener noreferrer">
-														<?php echo esc_html( $item['btn_text'] ); ?>
-													</a>
-												</div>
-											<?php endif; ?>
-										</article>
-
-									<?php endif; ?>
+										<?php endif; ?>
+									</article>
 								<?php endforeach; ?>
 							</div>
+
+						<?php else : ?>
+
+							<?php
+							// Mixes / Media tab — YouTube-first rendering
+							$items = array_values( $tab['items'] );
+							?>
+
+							<?php if ( ! empty( $items[0] ) ) :
+								$featured    = $items[0];
+								$featured_id = sp_youtube_id( $featured['youtube_url'] ?? '' );
+							?>
+								<!-- Featured: full YouTube embed -->
+								<div class="sp-yt-featured">
+									<?php if ( $featured_id ) : ?>
+										<div class="sp-yt-embed">
+											<iframe
+												src="https://www.youtube.com/embed/<?php echo esc_attr( $featured_id ); ?>?rel=0"
+												title="<?php echo esc_attr( $featured['title'] ); ?>"
+												frameborder="0"
+												allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+												allowfullscreen
+												loading="lazy"
+											></iframe>
+										</div>
+									<?php elseif ( ! empty( $featured['image'] ) ) : ?>
+										<img src="<?php echo esc_url( $featured['image'] ); ?>" alt="<?php echo esc_attr( $featured['title'] ); ?>" class="sp-yt-featured__img">
+									<?php endif; ?>
+									<h3 class="sp-yt-featured__title"><?php echo esc_html( $featured['title'] ); ?></h3>
+									<?php if ( ! empty( $featured['subtitle'] ) ) : ?>
+										<p class="sp-yt-featured__sub"><?php echo esc_html( $featured['subtitle'] ); ?></p>
+									<?php endif; ?>
+								</div>
+							<?php endif; ?>
+
+							<?php if ( count( $items ) > 1 ) : ?>
+								<!-- Rest: YouTube thumbnail list cards -->
+								<div class="sp-yt-list">
+									<?php foreach ( array_slice( $items, 1 ) as $item ) :
+										$vid_id  = sp_youtube_id( $item['youtube_url'] ?? '' );
+										$thumb   = $vid_id
+											? 'https://img.youtube.com/vi/' . $vid_id . '/mqdefault.jpg'
+											: ( $item['image'] ?? '' );
+										$link    = ! empty( $item['youtube_url'] ) ? $item['youtube_url'] : ( $item['btn_url'] ?? '#' );
+									?>
+										<a href="<?php echo esc_url( $link ); ?>" class="sp-yt-card" target="_blank" rel="noopener noreferrer">
+											<div class="sp-yt-card__thumb">
+												<?php if ( $thumb ) : ?>
+													<img src="<?php echo esc_url( $thumb ); ?>" alt="<?php echo esc_attr( $item['title'] ); ?>" loading="lazy">
+												<?php endif; ?>
+												<span class="sp-yt-card__play">
+													<svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg>
+												</span>
+											</div>
+											<div class="sp-yt-card__body">
+												<h4 class="sp-yt-card__title"><?php echo esc_html( $item['title'] ); ?></h4>
+												<?php if ( ! empty( $item['subtitle'] ) ) : ?>
+													<p class="sp-yt-card__sub"><?php echo esc_html( $item['subtitle'] ); ?></p>
+												<?php endif; ?>
+												<span class="sp-yt-card__source">youtube</span>
+											</div>
+										</a>
+									<?php endforeach; ?>
+								</div>
+							<?php endif; ?>
+
 						<?php endif; ?>
 					</div>
 				<?php endforeach; ?>
