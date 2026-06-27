@@ -6,15 +6,13 @@ defined( 'ABSPATH' ) || exit;
 // ---------------------------------------------------------------------------
 require_once get_template_directory() . '/vendor/plugin-update-checker/load-v5p3.php';
 
-add_action( 'after_setup_theme', function () {
-	$checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-		'https://github.com/developmentaruba/prime-theme/',
-		get_template_directory() . '/style.css',
-		'social-profile'
-	);
-
-	$checker->setBranch( 'main' );
-} );
+$sp_update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+	'https://github.com/developmentaruba/prime-theme/',
+	get_template_directory() . '/style.css',
+	'social-profile'
+);
+$sp_update_checker->setBranch( 'main' );
+unset( $sp_update_checker );
 
 // ---------------------------------------------------------------------------
 
