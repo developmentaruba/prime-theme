@@ -14,11 +14,6 @@ add_action( 'after_setup_theme', function () {
 	);
 
 	$checker->setBranch( 'main' );
-
-	// Private repo: reads token from wp-config.php constant GITHUB_ACCESS_TOKEN
-	if ( defined( 'GITHUB_ACCESS_TOKEN' ) ) {
-		$checker->setAuthentication( GITHUB_ACCESS_TOKEN );
-	}
 } );
 
 // ---------------------------------------------------------------------------
