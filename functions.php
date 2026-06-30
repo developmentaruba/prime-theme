@@ -16,6 +16,22 @@ unset( $sp_update_checker );
 
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Legal pages — serve /terms and /privacy without needing WP pages
+// ---------------------------------------------------------------------------
+function sp_legal_page_routes() {
+	$path = trim( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ), '/' );
+	if ( $path === 'terms' ) {
+		include get_template_directory() . '/page-terms.php';
+		exit;
+	}
+	if ( $path === 'privacy' ) {
+		include get_template_directory() . '/page-privacy.php';
+		exit;
+	}
+}
+add_action( 'template_redirect', 'sp_legal_page_routes' );
+
 function sp_theme_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );

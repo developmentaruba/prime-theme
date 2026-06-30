@@ -330,7 +330,7 @@ get_header();
 							$all_events = array_merge( $upcoming, $past );
 							?>
 
-							<div class="sp-cards">
+							<div class="sp-cards" data-sp-limit="5">
 								<?php foreach ( $all_events as $item ) :
 									$ts       = ! empty( $item['date'] ) ? strtotime( $item['date'] ) : 0;
 									$is_past  = $ts && $ts < $today;
@@ -361,7 +361,38 @@ get_header();
 												<?php if ( ! empty( $item['venue'] ) ) echo esc_html( $item['venue'] ); ?>
 											</p>
 										</div>
-										<?php if ( ! $is_past && ! empty( $item['btn_url'] ) && ! empty( $item['btn_text'] ) ) : ?>
+										<?php
+										$to = $item['ticket_options'] ?? [];
+										$has_loc   = ! empty( $to['location']['enabled'] ) && ! empty( $to['location']['items'] );
+										$has_payaw = ! empty( $to['payaw']['enabled'] );
+										$has_rsvp  = ! empty( $to['rsvp']['enabled'] )     && ! empty( $to['rsvp']['whatsapp'] );
+										$has_vip   = ! empty( $to['vip']['enabled'] )      && ! empty( $to['vip']['phone'] );
+										$has_link  = ! empty( $to['link']['enabled'] )     && ! empty( $to['link']['url'] );
+										$has_tickets = $has_loc || $has_payaw || $has_rsvp || $has_vip || $has_link;
+										?>
+										<?php if ( ! $is_past && $has_tickets ) :
+											$ticket_data = [
+												'title'    => $item['title'],
+												'btn_text' => $item['btn_text'] ?: 'Get Tickets',
+												'options'  => [],
+											];
+											if ( $has_loc ) {
+												foreach ( $to['location']['items'] as $loc_item ) {
+													$ticket_data['options'][] = [ 'type' => 'location', 'place_name' => $loc_item['place_name'] ?? '', 'address' => $loc_item['address'] ?? '', 'maps_url' => $loc_item['maps_url'] ?? '' ];
+												}
+											}
+											if ( $has_payaw ) $ticket_data['options'][] = [ 'type' => 'payaw' ];
+											if ( $has_rsvp )  $ticket_data['options'][] = [ 'type' => 'rsvp', 'whatsapp' => preg_replace( '/[^0-9+]/', '', $to['rsvp']['whatsapp'] ) ];
+											if ( $has_vip )   $ticket_data['options'][] = [ 'type' => 'vip',  'phone' => preg_replace( '/[^0-9+\-\s\(\)]/', '', $to['vip']['phone'] ) ];
+											if ( $has_link )  $ticket_data['options'][] = [ 'type' => 'link',     'url' => $to['link']['url'], 'label' => $to['link']['label'] ?: 'Buy Tickets' ];
+										?>
+											<div class="sp-card__action">
+												<button type="button" class="sp-card__btn sp-tickets-open"
+													data-tickets="<?php echo esc_attr( wp_json_encode( $ticket_data ) ); ?>">
+													<?php echo esc_html( $item['btn_text'] ?: 'Get Tickets' ); ?>
+												</button>
+											</div>
+										<?php elseif ( ! $is_past && ! empty( $item['btn_url'] ) && ! empty( $item['btn_text'] ) ) : ?>
 											<div class="sp-card__action">
 												<a href="<?php echo esc_url( $item['btn_url'] ); ?>" class="sp-card__btn" target="_blank" rel="noopener noreferrer">
 													<?php echo esc_html( $item['btn_text'] ); ?>
@@ -380,12 +411,13 @@ get_header();
 							?>
 
 							<?php if ( ! empty( $items[0] ) ) :
-								$featured    = $items[0];
-								$featured_id = sp_youtube_id( $featured['youtube_url'] ?? '' );
+								$featured      = $items[0];
+								$featured_type = $featured['media_type'] ?? 'youtube';
+								$featured_id   = $featured_type === 'youtube' ? sp_youtube_id( $featured['youtube_url'] ?? '' ) : '';
 							?>
-								<!-- Featured: full YouTube embed -->
+								<!-- Featured item -->
 								<div class="sp-yt-featured">
-									<?php if ( $featured_id ) : ?>
+									<?php if ( $featured_type === 'youtube' && $featured_id ) : ?>
 										<div class="sp-yt-embed">
 											<iframe
 												src="https://www.youtube.com/embed/<?php echo esc_attr( $featured_id ); ?>?rel=0"
@@ -396,25 +428,37 @@ get_header();
 												loading="lazy"
 											></iframe>
 										</div>
-									<?php elseif ( ! empty( $featured['image'] ) ) : ?>
+									<?php elseif ( $featured_type === 'custom' && ! empty( $featured['image'] ) ) : ?>
 										<img src="<?php echo esc_url( $featured['image'] ); ?>" alt="<?php echo esc_attr( $featured['title'] ); ?>" class="sp-yt-featured__img">
 									<?php endif; ?>
 									<h3 class="sp-yt-featured__title"><?php echo esc_html( $featured['title'] ); ?></h3>
 									<?php if ( ! empty( $featured['subtitle'] ) ) : ?>
 										<p class="sp-yt-featured__sub"><?php echo esc_html( $featured['subtitle'] ); ?></p>
 									<?php endif; ?>
+									<?php if ( $featured_type === 'custom' && ! empty( $featured['btn_url'] ) && ! empty( $featured['btn_text'] ) ) : ?>
+										<a href="<?php echo esc_url( $featured['btn_url'] ); ?>" class="sp-card__btn" target="_blank" rel="noopener noreferrer">
+											<?php echo esc_html( $featured['btn_text'] ); ?>
+										</a>
+									<?php endif; ?>
 								</div>
 							<?php endif; ?>
 
 							<?php if ( count( $items ) > 1 ) : ?>
-								<!-- Rest: YouTube thumbnail list cards -->
-								<div class="sp-yt-list">
+								<!-- Rest: thumbnail list cards -->
+								<div class="sp-yt-list" data-sp-limit="4">
 									<?php foreach ( array_slice( $items, 1 ) as $item ) :
-										$vid_id  = sp_youtube_id( $item['youtube_url'] ?? '' );
-										$thumb   = $vid_id
-											? 'https://img.youtube.com/vi/' . $vid_id . '/mqdefault.jpg'
-											: ( $item['image'] ?? '' );
-										$link    = ! empty( $item['youtube_url'] ) ? $item['youtube_url'] : ( $item['btn_url'] ?? '#' );
+										$item_type = $item['media_type'] ?? 'youtube';
+										$vid_id    = $item_type === 'youtube' ? sp_youtube_id( $item['youtube_url'] ?? '' ) : '';
+										if ( $item_type === 'youtube' ) {
+											$thumb = $vid_id ? 'https://img.youtube.com/vi/' . $vid_id . '/mqdefault.jpg' : '';
+											$link  = $item['youtube_url'] ?? '#';
+										} elseif ( $item_type === 'soundcloud' ) {
+											$thumb = $item['soundcloud_thumb'] ?? '';
+											$link  = $item['soundcloud_url'] ?? '#';
+										} else {
+											$thumb = $item['image'] ?? '';
+											$link  = $item['btn_url'] ?? '#';
+										}
 									?>
 										<a href="<?php echo esc_url( $link ); ?>" class="sp-yt-card" target="_blank" rel="noopener noreferrer">
 											<div class="sp-yt-card__thumb">
@@ -430,7 +474,13 @@ get_header();
 												<?php if ( ! empty( $item['subtitle'] ) ) : ?>
 													<p class="sp-yt-card__sub"><?php echo esc_html( $item['subtitle'] ); ?></p>
 												<?php endif; ?>
-												<span class="sp-yt-card__source">youtube</span>
+												<?php if ( $item_type === 'youtube' ) : ?>
+													<span class="sp-yt-card__source">youtube</span>
+												<?php elseif ( $item_type === 'soundcloud' ) : ?>
+													<span class="sp-yt-card__source">soundcloud</span>
+												<?php elseif ( ! empty( $item['btn_text'] ) ) : ?>
+													<span class="sp-yt-card__source"><?php echo esc_html( $item['btn_text'] ); ?></span>
+												<?php endif; ?>
 											</div>
 										</a>
 									<?php endforeach; ?>
@@ -444,6 +494,19 @@ get_header();
 
 		</section>
 	<?php endif; ?>
+
+	<!-- =================================================================
+	     TICKET OPTIONS MODAL
+	     ================================================================= -->
+	<div class="sp-modal-overlay" id="sp-ticket-overlay" role="dialog" aria-modal="true" aria-labelledby="sp-ticket-title" hidden>
+		<div class="sp-modal" id="sp-ticket-modal">
+			<button class="sp-modal__close" id="sp-ticket-close" aria-label="Close">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+			</button>
+			<h2 class="sp-modal__title" id="sp-ticket-title">Get Tickets</h2>
+			<div class="sp-ticket-opts" id="sp-ticket-opts"></div>
+		</div>
+	</div>
 
 </div><!-- .sp-page -->
 

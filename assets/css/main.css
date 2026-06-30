@@ -522,16 +522,22 @@ a     { color: inherit; text-decoration: none; }
 /* ── Thumbnail (square, fixed size) ── */
 .sp-card__thumb {
 	width: 80px;
-	height: 80px;
+	min-width: 80px;
+	align-self: stretch;
 	flex-shrink: 0;
 	background: color-mix(in srgb, var(--sp-accent) 10%, #111);
 	position: relative;
 	overflow: hidden;
+	border-radius: 12px 0 0 12px;
 }
 .sp-card__thumb img {
-	width: 100%;
-	height: 100%;
+	position: absolute;
+	inset: 0;
+	width: 100% !important;
+	height: 100% !important;
+	max-width: none !important;
 	object-fit: cover;
+	display: block;
 }
 .sp-card__thumb-icon {
 	width: 100%;
@@ -611,6 +617,10 @@ a     { color: inherit; text-decoration: none; }
 	gap: 6px;
 	flex-wrap: wrap;
 	margin-bottom: 2px;
+	justify-content: space-between;
+}
+.sp-card__past-badge {
+	margin-left: auto;
 }
 
 .sp-card--past {
@@ -628,23 +638,28 @@ a     { color: inherit; text-decoration: none; }
 	background: rgba(255,255,255,0.1);
 	color: rgba(240,240,240,0.6);
 	border: 1px solid rgba(255,255,255,0.15);
+	flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------
    YouTube featured embed
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Featured media item (first card)
+   -------------------------------------------------------------------------- */
 .sp-yt-featured {
-	margin-bottom: 20px;
+	background: var(--sp-card);
+	border-radius: 16px;
+	overflow: hidden;
+	margin-bottom: 10px;
+	border: 1px solid rgba(255,255,255,0.18);
 }
 
 .sp-yt-embed {
 	position: relative;
 	width: 100%;
-	padding-bottom: 56.25%; /* 16:9 */
-	border-radius: 12px;
-	overflow: hidden;
+	padding-bottom: 56.25%;
 	background: #000;
-	margin-bottom: 12px;
 }
 .sp-yt-embed iframe {
 	position: absolute;
@@ -656,58 +671,62 @@ a     { color: inherit; text-decoration: none; }
 
 .sp-yt-featured__img {
 	width: 100%;
-	border-radius: 12px;
 	display: block;
-	margin-bottom: 12px;
 }
 
 .sp-yt-featured__title {
 	font-size: 1rem;
 	font-weight: 700;
 	color: var(--sp-text);
-	margin: 0 0 4px;
-	line-height: 1.3;
+	margin: 0;
+	line-height: 1.35;
+	padding: 14px 16px 16px;
 }
 
 .sp-yt-featured__sub {
 	font-size: 0.82rem;
 	color: var(--sp-text-muted);
 	margin: 0;
+	padding: 0 16px 14px;
 }
 
 /* --------------------------------------------------------------------------
-   YouTube list cards (below featured)
+   Media list cards
    -------------------------------------------------------------------------- */
 .sp-yt-list {
 	display: flex;
 	flex-direction: column;
-	gap: 0;
+	gap: 10px;
 }
 
 .sp-yt-card {
-	display: flex;
+	display: flex !important;
+	flex-direction: row !important;
 	align-items: center;
 	gap: 12px;
-	padding: 12px 0;
-	border-bottom: 1px solid var(--sp-border);
+	padding: 10px;
+	background: var(--sp-card);
+	border: 1px solid rgba(255,255,255,0.18);
+	border-radius: 16px;
 	text-decoration: none;
 	transition: opacity 0.15s;
 }
-.sp-yt-card:last-child { border-bottom: none; }
 .sp-yt-card:hover { opacity: 0.75; }
 
 .sp-yt-card__thumb {
 	position: relative;
-	width: 120px;
-	flex-shrink: 0;
-	border-radius: 6px;
+	flex: 0 0 82px;
+	width: 82px;
+	max-width: 82px;
+	height: 58px;
+	border-radius: 10px;
+	background: rgba(255,255,255,0.05);
 	overflow: hidden;
-	background: rgba(255,255,255,0.06);
-	aspect-ratio: 16/9;
 }
 .sp-yt-card__thumb img {
-	width: 100%;
-	height: 100%;
+	width: 82px !important;
+	height: 58px !important;
+	max-width: 82px !important;
 	object-fit: cover;
 	display: block;
 }
@@ -717,7 +736,7 @@ a     { color: inherit; text-decoration: none; }
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgba(0,0,0,0.35);
+	background: rgba(0,0,0,0.45);
 	color: #fff;
 	opacity: 0;
 	transition: opacity 0.15s;
@@ -730,10 +749,10 @@ a     { color: inherit; text-decoration: none; }
 }
 .sp-yt-card__title {
 	font-size: 0.875rem;
-	font-weight: 600;
+	font-weight: 700;
 	color: var(--sp-text);
-	margin: 0 0 3px;
-	line-height: 1.35;
+	margin: 0 0 5px;
+	line-height: 1.3;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
@@ -742,25 +761,251 @@ a     { color: inherit; text-decoration: none; }
 .sp-yt-card__sub {
 	font-size: 0.78rem;
 	color: var(--sp-text-muted);
-	margin: 0 0 4px;
+	margin: 0 0 3px;
 }
 .sp-yt-card__source {
-	font-size: 0.7rem;
+	font-size: 0.75rem;
 	color: var(--sp-text-muted);
+	opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Ticket Modal Options
+   -------------------------------------------------------------------------- */
+.sp-ticket-subtitle {
+	font-size: 0.88rem;
+	color: var(--sp-text-muted);
+	margin: -6px 0 20px;
+	line-height: 1.5;
+}
+.sp-ticket-subtitle strong {
+	color: var(--sp-text);
+	font-weight: 700;
+}
+.sp-ticket-opts {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 4px;
+}
+.sp-ticket-opt {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 14px 16px;
+	background: rgba(255,255,255,0.04);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 14px;
+	text-decoration: none;
+	color: var(--sp-text);
+	transition: background 0.15s, border-color 0.15s;
+}
+.sp-ticket-opt--link { cursor: pointer; }
+.sp-ticket-opt--link:hover {
+	background: rgba(255,255,255,0.08);
+	border-color: rgba(255,255,255,0.2);
+}
+.sp-ticket-opt__icon {
+	width: 42px;
+	height: 42px;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+.sp-ticket-opt--location .sp-ticket-opt__icon   { background: rgba(163,230,53,0.15); color: #a3e635; }
+.sp-ticket-opt--payaw    .sp-ticket-opt__icon   { background: transparent; }
+.sp-ticket-opt__icon--payaw                     { width: 42px; min-width: 42px; }
+.sp-ticket-opt--whatsapp .sp-ticket-opt__icon   { background: rgba(34,197,94,0.15); color: #22c55e; }
+.sp-ticket-opt--vip         .sp-ticket-opt__icon { background: rgba(234,179,8,0.15);  color: #ca8a04; }
+.sp-ticket-opt--link-custom .sp-ticket-opt__icon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+.sp-ticket-opt__body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+.sp-ticket-opt__label {
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: var(--sp-text);
+	line-height: 1.2;
+	word-break: break-word;
+}
+.sp-ticket-opt__sublabel {
+	font-size: 0.78rem;
+	color: var(--sp-text-muted);
+	line-height: 1.3;
+}
+.sp-ticket-opt__value {
+	font-size: 0.78rem;
+	color: var(--sp-text-muted);
+	line-height: 1.3;
+	word-break: break-word;
+}
+a.sp-ticket-opt--location {
+	text-decoration: none;
+	color: inherit;
+}
+.sp-ticket-opt__arrow {
+	color: var(--sp-text-muted);
+	flex-shrink: 0;
 	opacity: 0.6;
 }
 
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
+/* Load More */
+.sp-hidden { display: none !important; }
+.sp-load-more {
+	display: block;
+	width: 100%;
+	margin-top: 12px;
+	padding: 12px;
+	background: transparent;
+	border: 1px solid var(--sp-border);
+	border-radius: 12px;
+	color: var(--sp-text-muted);
+	font-size: 0.875rem;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+	transition: border-color 0.15s, color 0.15s;
+	text-align: center;
+}
+.sp-load-more:hover {
+	border-color: var(--sp-accent);
+	color: var(--sp-accent);
+}
+
 .sp-footer {
 	text-align: center;
-	padding: 32px 20px;
+	padding: 36px 20px 40px;
+	border-top: 1px solid var(--sp-border);
+	margin-top: 48px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+.sp-footer__logo {
+	width: auto;
+	height: 52px;
+	object-fit: contain;
+	opacity: 0.85;
+}
+.sp-footer__copy {
 	font-size: 0.78rem;
 	color: var(--sp-text-muted);
-	border-top: 1px solid var(--sp-border);
-	margin-top: 60px;
+	margin: 0;
 }
+.sp-footer__links {
+	display: flex;
+	gap: 16px;
+}
+.sp-footer__links a {
+	font-size: 0.78rem;
+	color: var(--sp-text-muted);
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.sp-footer__links a:hover { color: var(--sp-text); }
+.sp-footer__powered {
+	font-size: 0.72rem;
+	color: var(--sp-text-muted);
+	margin: 0;
+	opacity: 0.6;
+}
+.sp-footer__powered a {
+	color: inherit;
+	text-decoration: none;
+}
+.sp-footer__powered a:hover { opacity: 0.85; }
+
+/* --------------------------------------------------------------------------
+   Terms / Privacy pages
+   -------------------------------------------------------------------------- */
+.sp-legal {
+	min-height: 100vh;
+	background: var(--sp-bg);
+	color: var(--sp-text);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.sp-legal__header {
+	display: flex;
+	align-items: center;
+	padding: 16px 20px;
+	border-bottom: 1px solid var(--sp-border);
+	position: sticky;
+	top: 0;
+	background: var(--sp-bg);
+	z-index: 10;
+}
+.sp-legal__back {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	background: none;
+	border: none;
+	color: var(--sp-text-muted);
+	font-size: 0.95rem;
+	font-family: inherit;
+	cursor: pointer;
+	padding: 6px 0;
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.sp-legal__back:hover { color: var(--sp-text); }
+.sp-legal__logo-wrap {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+}
+.sp-legal__logo {
+	height: 36px;
+	width: auto;
+	object-fit: contain;
+	margin-right: 30px; /* offset for back button so logo appears centered */
+}
+.sp-legal__body {
+	max-width: 680px;
+	margin: 0 auto;
+	padding: 32px 24px 80px;
+}
+.sp-legal__body h1 {
+	font-size: 1.6rem;
+	font-weight: 800;
+	margin: 0 0 6px;
+	color: var(--sp-text);
+}
+.sp-legal__updated {
+	font-size: 0.8rem;
+	color: var(--sp-text-muted);
+	margin: 0 0 28px;
+}
+.sp-legal__body h2 {
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 28px 0 8px;
+	color: var(--sp-text);
+}
+.sp-legal__body p,
+.sp-legal__body li {
+	font-size: 0.92rem;
+	line-height: 1.7;
+	color: var(--sp-text-muted);
+	margin: 0 0 10px;
+}
+.sp-legal__body ul {
+	padding-left: 20px;
+	margin: 0 0 12px;
+}
+.sp-legal__body strong { color: var(--sp-text); font-weight: 700; }
+.sp-legal__body a { color: var(--sp-accent); text-decoration: none; }
+.sp-legal__body a:hover { text-decoration: underline; }
 
 /* --------------------------------------------------------------------------
    Responsive
