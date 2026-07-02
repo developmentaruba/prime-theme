@@ -398,8 +398,11 @@
 					var el = document.createElement('a');
 					el.className = 'sp-ticket-opt sp-ticket-opt--link sp-ticket-opt--link-custom';
 					el.href = opt.url; el.target = '_blank'; el.rel = 'noopener noreferrer';
+					var linkIcon = opt.icon_url
+						? '<span class="sp-ticket-opt__icon sp-ticket-opt__icon--img"><img src="' + escHtml(opt.icon_url) + '" alt="" width="36" height="36" style="border-radius:8px;object-fit:cover;display:block;width:36px;height:36px;"></span>'
+						: '<span class="sp-ticket-opt__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.1-1.1m-.757-4.9a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg></span>';
 					el.innerHTML =
-						'<span class="sp-ticket-opt__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.1-1.1m-.757-4.9a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg></span>' +
+						linkIcon +
 						'<div class="sp-ticket-opt__body"><span class="sp-ticket-opt__label">' + escHtml(opt.label) + '</span><span class="sp-ticket-opt__sublabel">Tap to open link</span></div>' +
 						arrow;
 					optsWrap.appendChild(el);

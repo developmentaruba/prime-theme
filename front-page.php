@@ -384,7 +384,7 @@ get_header();
 											if ( $has_payaw ) $ticket_data['options'][] = [ 'type' => 'payaw' ];
 											if ( $has_rsvp )  $ticket_data['options'][] = [ 'type' => 'rsvp', 'whatsapp' => preg_replace( '/[^0-9+]/', '', $to['rsvp']['whatsapp'] ) ];
 											if ( $has_vip )   $ticket_data['options'][] = [ 'type' => 'vip',  'phone' => preg_replace( '/[^0-9+\-\s\(\)]/', '', $to['vip']['phone'] ) ];
-											if ( $has_link )  $ticket_data['options'][] = [ 'type' => 'link',     'url' => $to['link']['url'], 'label' => $to['link']['label'] ?: 'Buy Tickets' ];
+											if ( $has_link )  $ticket_data['options'][] = [ 'type' => 'link', 'url' => $to['link']['url'], 'label' => $to['link']['label'] ?: 'Buy Tickets', 'icon_url' => $to['link']['icon_url'] ?? '' ];
 										?>
 											<div class="sp-card__action">
 												<button type="button" class="sp-card__btn sp-tickets-open"
