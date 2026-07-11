@@ -45,13 +45,18 @@ function sp_enqueue_assets() {
 	wp_enqueue_style(  'sp-main', get_template_directory_uri() . '/assets/css/main.css', [], $ver );
 	wp_enqueue_script( 'sp-main', get_template_directory_uri() . '/assets/js/main.js', [], $ver, true );
 
-	wp_localize_script( 'sp-main', 'spData', [
+}
+add_action( 'wp_enqueue_scripts', 'sp_enqueue_assets' );
+
+function sp_inline_data() {
+	$data = [
 		'isPreview'      => ( isset( $_GET['sp_preview'] ) && '1' === $_GET['sp_preview'] ),
 		'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 		'subscribeNonce' => wp_create_nonce( 'spm_subscribe_nonce' ),
-	] );
+	];
+	echo '<script>window.spData = ' . wp_json_encode( $data ) . ';</script>' . "\n";
 }
-add_action( 'wp_enqueue_scripts', 'sp_enqueue_assets' );
+add_action( 'wp_head', 'sp_inline_data', 5 );
 
 // ---------------------------------------------------------------------------
 // Inline CSS variables from saved colors
