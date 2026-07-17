@@ -41,7 +41,7 @@ function sp_theme_setup() {
 add_action( 'after_setup_theme', 'sp_theme_setup' );
 
 function sp_enqueue_assets() {
-	$ver = '1.1.0';
+	$ver = '1.1.1';
 	wp_enqueue_style(  'sp-main', get_template_directory_uri() . '/assets/css/main.css', [], $ver );
 	wp_enqueue_script( 'sp-main', get_template_directory_uri() . '/assets/js/main.js', [], $ver, true );
 
@@ -50,9 +50,8 @@ add_action( 'wp_enqueue_scripts', 'sp_enqueue_assets' );
 
 function sp_inline_data() {
 	$data = [
-		'isPreview'      => ( isset( $_GET['sp_preview'] ) && '1' === $_GET['sp_preview'] ),
-		'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-		'subscribeNonce' => wp_create_nonce( 'spm_subscribe_nonce' ),
+		'isPreview' => ( isset( $_GET['sp_preview'] ) && '1' === $_GET['sp_preview'] ),
+		'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 	];
 	echo '<script>window.spData = ' . wp_json_encode( $data ) . ';</script>' . "\n";
 }

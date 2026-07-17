@@ -4,7 +4,6 @@
 
 	var d    = window.spData || {};
 	var ajax = d.ajaxUrl || '';
-	var nonc = d.subscribeNonce || '';
 
 	// -----------------------------------------------------------------------
 	// Tab Switching + hash URLs
@@ -109,14 +108,22 @@
 				submitBtn.disabled = true;
 				if (btnLabel) btnLabel.textContent = 'Signing up…';
 
-				var body = new FormData();
-				body.append('action',       'spm_subscribe');
-				body.append('nonce',        nonc);
-				body.append('email',        emailVal);
-				body.append('dial_code',    dialCodeVal);
-				body.append('phone_number', phoneNumVal);
+				fetch(ajax + '?action=spm_get_nonce', { method: 'GET', credentials: 'same-origin' })
+					.then(function (r) { return r.json(); })
+					.then(function (nonceRes) {
+						if (!nonceRes.success || !nonceRes.data || !nonceRes.data.nonce) {
+							throw new Error('nonce-failed');
+						}
 
-				fetch(ajax, { method: 'POST', body: body, credentials: 'same-origin' })
+						var body = new FormData();
+						body.append('action',       'spm_subscribe');
+						body.append('nonce',        nonceRes.data.nonce);
+						body.append('email',        emailVal);
+						body.append('dial_code',    dialCodeVal);
+						body.append('phone_number', phoneNumVal);
+
+						return fetch(ajax, { method: 'POST', body: body, credentials: 'same-origin' });
+					})
 					.then(function (r) { return r.json(); })
 					.then(function (res) {
 						submitBtn.disabled = false;
