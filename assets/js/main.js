@@ -108,7 +108,10 @@
 				submitBtn.disabled = true;
 				if (btnLabel) btnLabel.textContent = 'Signing up…';
 
-				fetch(ajax + '?action=spm_get_nonce', { method: 'GET', credentials: 'same-origin' })
+				var nonceBody = new FormData();
+				nonceBody.append('action', 'spm_get_nonce');
+
+				fetch(ajax, { method: 'POST', body: nonceBody, credentials: 'same-origin' })
 					.then(function (r) { return r.json(); })
 					.then(function (nonceRes) {
 						if (!nonceRes.success || !nonceRes.data || !nonceRes.data.nonce) {

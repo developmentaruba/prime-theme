@@ -41,7 +41,7 @@ function sp_theme_setup() {
 add_action( 'after_setup_theme', 'sp_theme_setup' );
 
 function sp_enqueue_assets() {
-	$ver = '1.1.1';
+	$ver = '1.1.2';
 	wp_enqueue_style(  'sp-main', get_template_directory_uri() . '/assets/css/main.css', [], $ver );
 	wp_enqueue_script( 'sp-main', get_template_directory_uri() . '/assets/js/main.js', [], $ver, true );
 
